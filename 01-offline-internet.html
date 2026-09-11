@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Offline Internet</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b0b0c;color:#f4f4f5;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:54px 28px 70px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.brand{font-size:15px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#b8b8bc}
+.status{font-size:12px;color:#8e8e94;border:1px solid #29292e;border-radius:999px;padding:7px 10px}
+.hero{padding:78px 0 58px}
+.kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#7e7e84;margin-bottom:18px}
+h1{font-size:clamp(54px,9vw,104px);line-height:.9;letter-spacing:-.065em;margin:0;max-width:850px}
+.hero p{font-size:19px;line-height:1.55;color:#a7a7ad;max-width:650px;margin:25px 0 0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.card{display:block;text-decoration:none;color:inherit;background:#121214;border:1px solid #27272c;border-radius:18px;padding:24px;min-height:230px;transition:.18s transform,.18s border-color,.18s background}
+.card:hover{transform:translateY(-3px);border-color:#505057;background:#16161a}
+.card.primary{min-height:290px;grid-column:span 2;background:#151518}
+.number{font-size:11px;color:#707077;letter-spacing:.14em;text-transform:uppercase}
+.card h2{font-size:30px;letter-spacing:-.035em;margin:45px 0 8px}
+.card p{color:#929299;line-height:1.5;margin:0;max-width:600px}
+.arrow{display:inline-block;margin-top:25px;color:#ddd;font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:28px}
+.pill{font-size:11px;color:#aaa;border:1px solid #303036;border-radius:999px;padding:5px 8px}
+.section{margin-top:55px}
+.section h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#77777e;margin:0 0 14px}
+.panel{border:1px solid #27272c;border-radius:16px;background:#101012;padding:18px}
+.row{display:flex;justify-content:space-between;gap:18px;padding:12px 2px;border-bottom:1px solid #242429;color:#aaa}
+.row:last-child{border-bottom:0}
+.row b{color:#eee}
+.footer{margin-top:55px;color:#65656b;font-size:12px;line-height:1.6}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.card.primary{grid-column:auto}.hero{padding-top:55px}.card h2{margin-top:35px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div class="brand">Offline Internet</div>
+    <div class="status">LOCAL-FIRST · v1</div>
+  </header>
+
+  <section class="hero">
+    <div class="kicker">Your personal internet</div>
+    <h1>Everything<br>worth keeping.</h1>
+    <p>A small local-first ecosystem for your music, discoveries, knowledge and internet history. No feed. No algorithm deciding what matters. Just your archive.</p>
+  </section>
+
+  <section class="grid">
+    <a class="card primary" href="02-music-story-finder.html">
+      <div class="number">01 · Flagship</div>
+      <h2>Music Story Finder</h2>
+      <p>Your permanent master music index: songs, artists, albums, sources, decades, listening history, notes and the connections that tell the story of your taste.</p>
+      <div class="meta"><span class="pill">Music archive</span><span class="pill">Graph</span><span class="pill">Timeline</span><span class="pill">Local files</span></div>
+      <span class="arrow">Open music archive →</span>
+    </a>
+
+    <a class="card" href="03-human-algorithm.html">
+      <div class="number">02</div>
+      <h2>Human Algorithm</h2>
+      <p>Map the people and paths behind your music discoveries.</p>
+      <span class="arrow">Open →</span>
+    </a>
+
+    <a class="card" href="04-internet-museum.html">
+      <div class="number">03</div>
+      <h2>Internet Museum</h2>
+      <p>Collect websites, videos, images and pieces of internet culture worth remembering.</p>
+      <span class="arrow">Open →</span>
+    </a>
+
+    <a class="card" href="05-personal-wikipedia.html">
+      <div class="number">04</div>
+      <h2>Personal Wikipedia</h2>
+      <p>Your own interconnected encyclopedia for things you want to remember.</p>
+      <span class="arrow">Open →</span>
+    </a>
+  </section>
+
+  <section class="section">
+    <h3>The idea</h3>
+    <div class="panel">
+      <div class="row"><b>Offline Internet</b><span>The hub</span></div>
+      <div class="row"><b>Music Story Finder</b><span>The archive</span></div>
+      <div class="row"><b>Human Algorithm</b><span>The connections</span></div>
+      <div class="row"><b>Internet Museum</b><span>The collection</span></div>
+      <div class="row"><b>Personal Wikipedia</b><span>The knowledge</span></div>
+    </div>
+  </section>
+
+  <div class="footer">Designed to work as a set of standalone HTML files. The hub is deliberately simple: it is the front door, not another complicated database.</div>
+</main>
+</body>
+</html>

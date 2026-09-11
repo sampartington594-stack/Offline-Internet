@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Music Library</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101110;color:#d9dedb;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.top{height:52px;border-bottom:1px solid #292d2b;background:#111312;display:flex;align-items:center;padding:0 18px;gap:14px;position:sticky;top:0;z-index:10}
+.back{text-decoration:none;color:#858c88;font-size:12px}
+.title{font-weight:750;white-space:nowrap}
+.search{margin-left:auto;width:230px;background:#181b19;border:1px solid #303532;color:#ddd;border-radius:6px;padding:7px 9px;font-size:12px}
+.top button{background:#191c1a;border:1px solid #303532;color:#cbd0cd;border-radius:6px;padding:7px 10px;font-size:12px}
+.top button.add{background:#dce1de;color:#111;border-color:#dce1de}
+.wrap{padding:22px 22px 50px;max-width:1450px;margin:auto}
+.header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:18px}
+h1{font-size:26px;letter-spacing:-.035em;margin:0 0 5px}
+.sub{color:#727975;font-size:12px}
+.controls{display:flex;gap:7px}
+.control{background:#171a18;border:1px solid #2c302e;color:#aeb5b1;border-radius:6px;padding:7px 10px;font-size:11px}
+.table-shell{border:1px solid #292e2c;border-radius:8px;overflow:auto;background:#111312}
+table{border-collapse:collapse;width:100%;min-width:1100px}
+th{height:34px;text-align:left;padding:0 10px;background:#171a18;border-bottom:1px solid #303532;color:#737b77;font-size:10px;font-weight:650;letter-spacing:.05em}
+td{height:34px;padding:5px 10px;border-bottom:1px solid #222624;color:#b8bfbb;vertical-align:middle}
+tr:hover td{background:#171a18}
+tr:last-child td{border-bottom:0}
+.song{color:#dfe4e1;font-weight:600}
+.artist{color:#aeb7b2}
+.link{color:#7fa899;text-decoration:none}
+.link:hover{text-decoration:underline}
+.tag{display:inline-block;color:#919995;border:1px solid #353a37;border-radius:4px;padding:2px 6px;margin:2px 3px 2px 0;font-size:10px;background:#151816}
+.file{color:#747c78;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+.muted{color:#555d59}
+.empty{padding:55px;text-align:center;color:#656d69}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:30}
+.modal.show{display:flex}
+.dialog{width:min(680px,100%);max-height:90vh;overflow:auto;background:#171a18;border:1px solid #3a403d;border-radius:10px;padding:20px}
+.dialog h2{font-size:19px;margin:0 0 16px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:grid;gap:5px}
+.field.full{grid-column:1/-1}
+label{font-size:10px;color:#747c78;text-transform:uppercase;letter-spacing:.08em}
+input,textarea,select{width:100%;background:#0f1110;border:1px solid #333936;color:#e1e5e3;border-radius:6px;padding:9px}
+textarea{min-height:80px;resize:vertical}
+.actions{display:flex;justify-content:flex-end;gap:7px;margin-top:16px}
+.actions button{background:#191c1a;border:1px solid #353a37;color:#ccd1ce;border-radius:6px;padding:8px 12px}
+.actions .save{background:#dce1de;color:#111;border-color:#dce1de}
+.note{color:#7e8682;font-size:11px;margin-top:12px;line-height:1.4}
+@media(max-width:750px){.search{width:150px}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.header{display:block}.controls{margin-top:12px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="back" href="01-offline-internet.html">← Offline Internet</a>
+  <div class="title">Music Library</div>
+  <input class="search" id="search" placeholder="Search..." oninput="render()">
+  <button onclick="exportData()">Export</button>
+  <button class="add" onclick="openModal()">+ New</button>
+</header>
+
+<main class="wrap">
+  <div class="header">
+    <div>
+      <h1>Music Library</h1>
+      <div class="sub" id="count">0 results</div>
+    </div>
+    <div class="controls">
+      <button class="control" onclick="seedExample()">Example rows</button>
+      <button class="control" onclick="clearAll()">Clear</button>
+    </div>
+  </div>
+
+  <div class="table-shell">
+    <table>
+      <thead>
+        <tr>
+          <th>Song</th>
+          <th>Artist</th>
+          <th>Curator</th>
+          <th>Album</th>
+          <th>URL</th>
+          <th>Playlist</th>
+          <th>Decade</th>
+          <th>File</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="empty" class="empty">No music in the library yet. Click + New to add a track.</div>
+  </div>
+</main>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="dialog">
+    <h2>Add track</h2>
+    <div class="form">
+      <div class="field"><label>Song</label><input id="song" placeholder="Track title"></div>
+      <div class="field"><label>Artist</label><input id="artist" placeholder="Artist"></div>
+      <div class="field"><label>Curator</label><input id="curator" placeholder="Who recommended / curated it?"></div>
+      <div class="field"><label>Album</label><input id="album" placeholder="Album"></div>
+      <div class="field full"><label>URL</label><input id="url" placeholder="Apple Music, Spotify, YouTube, etc."></div>
+      <div class="field"><label>Playlist</label><input id="playlist" placeholder="Hang 444, Ambient..."></div>
+      <div class="field"><label>Decade</label>
+        <select id="decade">
+          <option value="">—</option><option>1950s</option><option>1960s</option><option>1970s</option>
+          <option>1980s</option><option>1990s</option><option>2000s</option><option>2010s</option>
+          <option>2020s</option><option>2030s</option>
+        </select>
+      </div>
+      <div class="field full"><label>Local file</label><input id="file" type="file" accept="audio/*"></div>
+      <div class="field full"><label>Notes</label><textarea id="notes" placeholder="Optional notes about the track"></textarea></div>
+    </div>
+    <div class="note">The library is local to this browser. Nothing is uploaded. The file column records the local filename; the actual audio file remains on your device.</div>
+    <div class="actions">
+      <button onclick="closeModal()">Cancel</button>
+      <button class="save" onclick="addTrack()">Add to library</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY="offlineInternetMusicLibrary";
+let data=JSON.parse(localStorage.getItem(KEY)||"[]");
+
+function esc(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));}
+function filtered(){
+  const q=(document.getElementById("search").value||"").toLowerCase().trim();
+  if(!q)return data;
+  return data.filter(x=>[x.song,x.artist,x.curator,x.album,x.url,x.playlist,x.decade,x.file,x.notes].join(" ").toLowerCase().includes(q));
+}
+function playlistTags(value){
+  if(!value)return '<span class="muted">—</span>';
+  return value.split(",").map(x=>x.trim()).filter(Boolean).map(x=>`<span class="tag">${esc(x)}</span>`).join("");
+}
+function urlCell(url){
+  if(!url)return '<span class="muted">—</span>';
+  let label="link";
+  try{
+    const u=new URL(url);
+    if(u.hostname.includes("music.apple.com"))label="Apple Music";
+    else if(u.hostname.includes("spotify.com"))label="Spotify";
+    else if(u.hostname.includes("youtube.com")||u.hostname.includes("youtu.be"))label="YouTube";
+  }catch(e){}
+  return `<a class="link" href="${esc(url)}" target="_blank" rel="noopener">${label} ↗</a>`;
+}
+function render(){
+  const list=filtered();
+  document.getElementById("count").textContent=`${list.length} ${list.length===1?"result":"results"} · ${data.length} in library`;
+  document.getElementById("rows").innerHTML=list.map(x=>`
+    <tr>
+      <td class="song">${esc(x.song)}</td>
+      <td class="artist">${esc(x.artist)}</td>
+      <td>${x.curator?esc(x.curator):'<span class="muted">—</span>'}</td>
+      <td>${x.album?esc(x.album):'<span class="muted">—</span>'}</td>
+      <td>${urlCell(x.url)}</td>
+      <td>${playlistTags(x.playlist)}</td>
+      <td>${x.decade?esc(x.decade):'<span class="muted">—</span>'}</td>
+      <td class="file">${x.file?esc(x.file):'<span class="muted">—</span>'}</td>
+    </tr>`).join("");
+  document.getElementById("empty").style.display=list.length?"none":"block";
+}
+function openModal(){document.getElementById("modal").classList.add("show");}
+function closeModal(){document.getElementById("modal").classList.remove("show");}
+function val(id){return document.getElementById(id).value.trim();}
+function addTrack(){
+  const song=val("song"),artist=val("artist");
+  if(!song||!artist){alert("Song and artist are required.");return;}
+  const f=document.getElementById("file").files[0];
+  data.push({song,artist,curator:val("curator"),album:val("album"),url:val("url"),playlist:val("playlist"),decade:document.getElementById("decade").value,file:f?f.name:"",notes:val("notes")});
+  save(); render(); closeModal();
+  ["song","artist","curator","album","url","playlist","notes"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("decade").value="";
+  document.getElementById("file").value="";
+}
+function seedExample(){
+  const rows=[
+    {song:"Corcovado",artist:"Antonio Carlos Jobim × João Gilberto",curator:"",album:"Getz/Gilberto",url:"https://music.apple.com/",playlist:"Hang 444",decade:"1960s",file:"05 Corcovado (Quiet Nights of Quiet Stars).m4a"},
+    {song:"Wave",artist:"Antonio Carlos Jobim × João Gilberto",curator:"",album:"Getz/Gilberto",url:"https://music.apple.com/",playlist:"Hang 444",decade:"1960s",file:"01 Wave.m4a"},
+    {song:"Time",artist:"Pink Floyd",curator:"",album:"The Dark Side of the Moon",url:"https://open.spotify.com/",playlist:"Hang 444",decade:"1970s",file:"04 Time.m4a"},
+    {song:"Just the Two of Us",artist:"Grover Washington Jr.",curator:"",album:"Winelight",url:"https://music.apple.com/",playlist:"Electronic music that's actually good",decade:"1980s",file:"05 Just the Two of Us.m4p"},
+    {song:"Time moves slow",artist:"BADBADNOTGOOD",curator:"",album:"IV",url:"https://music.apple.com/",playlist:"Hang 444",decade:"2010s",file:""},
+    {song:"Don't look back in anger",artist:"Oasis",curator:"",album:"(What's the Story) Morning Glory?",url:"https://music.apple.com/",playlist:"Hang 444",decade:"1990s",file:""},
+    {song:"1-1",artist:"Brian Eno",curator:"",album:"Ambient 1: Music for Airports",url:"https://music.apple.com/",playlist:"Ambient",decade:"1970s",file:""},
+    {song:"Food For The Soul",artist:"itsmurph",curator:"",album:"",url:"https://music.apple.com/",playlist:"",decade:"2020s",file:""},
+    {song:"Todo Dia",artist:"Baby Consuelo",curator:"",album:"",url:"https://music.apple.com/",playlist:"Electronic music that's actually good",decade:"2010s",file:"04 Todo Dia Era Dia de Índio.m4a"},
+    {song:"one2three",artist:"Disclosure",curator:"",album:"",url:"https://music.apple.com/",playlist:"Electronic music that's actually good",decade:"2020s",file:"03 one2three.m4a"},
+    {song:"Mi Ho Miheia",artist:"Farafina",curator:"",album:"",url:"https://music.apple.com/",playlist:"",decade:"1980s",file:"01 Mi Ho Miheia.m4p"},
+    {song:"KIMPTON",artist:"Barry Can't Swim",curator:"",album:"Loner",url:"https://music.apple.com/",playlist:"",decade:"2020s",file:"03 KIMPTON (with O Flynn).mp3"},
+    {song:"Brasilian Skies",artist:"Masayoshi Takanaka",curator:"",album:"Brasilian Skies",url:"https://music.apple.com/",playlist:"",decade:"1970s",file:"02 Brasilian Skies.m4a"}
+  ];
+  data=[...rows,...data];save();render();
+}
+function clearAll(){if(confirm("Clear this music library?")){data=[];save();render();}}
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="music-library.json";a.click();URL.revokeObjectURL(a.href);
+}
+render();
+</script>
+</body>
+</html>
